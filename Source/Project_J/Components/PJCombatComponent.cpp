@@ -1,0 +1,103 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Components/PJCombatComponent.h"
+//#include "Equipments/PJEquipment.h"
+#include "Equipments/PJWeapon.h"
+#include "Equipments/PJArmour.h"
+#include "Items/PJPickupItem.h"
+#include "Character/PJCharacter.h"
+#include "GameFramework/Actor.h"
+
+// Sets default values for this component's properties
+UPJCombatComponent::UPJCombatComponent()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = true;
+
+	// ...
+}
+
+
+// Called when the game starts
+void UPJCombatComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// ...
+	
+}
+
+
+// Called every frame
+void UPJCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	// ...
+}
+
+void UPJCombatComponent::SetWeapon(APJWeapon* NewWeapon)
+{
+	if (::IsValid(MainWeapon))
+	{
+		if (APJCharacter* OwnerCharacter = Cast<APJCharacter>(GetOwner()))
+		{
+			APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
+				APJPickupItem::StaticClass(),
+				OwnerCharacter->GetActorTransform(),
+				nullptr,
+				nullptr,
+				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+
+			PickupItem->SetEquipmentClass(MainWeapon->GetClass());
+			PickupItem->FinishSpawning(GetOwner()->GetActorTransform());
+
+			MainWeapon->Destroy();
+		}
+
+			
+	}
+
+	MainWeapon = NewWeapon;
+}
+void UPJCombatComponent::SetArmour(APJArmour* NewArmour)
+{
+	const EPJArmourType ArmourType = NewArmour->GetArmourType();
+
+	if (APJArmour* EquippedArmourPart = GetArmour(ArmourType))
+	{
+		if (IsValid(EquippedArmourPart))
+		{
+			if (const AActor* OwnerActor = GetOwner())
+			{
+				APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
+					APJPickupItem::StaticClass(),
+					OwnerActor->GetActorTransform(),
+					nullptr,
+					nullptr,
+					ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+
+				PickupItem->SetEquipmentClass(EquippedArmourPart->GetClass());
+				PickupItem->FinishSpawning(GetOwner()->GetActorTransform());
+			}
+			EquippedArmourPart->UnequipItem();
+			EquippedArmourPart->Destroy();
+		}
+		ArmourMap[ArmourType] = NewArmour;
+	}
+	else
+	{
+		ArmourMap.Add(ArmourType, NewArmour);
+	}
+
+}
+void UPJCombatComponent::SetCombatEnabled(const bool bEnabled)
+{
+	bCombatEnabled = bEnabled;
+	if (OnChangedCombat.IsBound())
+	{
+		OnChangedCombat.Broadcast(bCombatEnabled); 
+	}
+}
