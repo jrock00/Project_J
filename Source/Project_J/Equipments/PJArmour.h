@@ -30,5 +30,7 @@ public:
 	virtual void AttachToOwner(FName SocketName) override;
 
 	FORCEINLINE EPJArmourType GetArmourType() {return ArmourType;}
+
+	void SetBodyPartActive(const bool bActive) const;
 	
 };

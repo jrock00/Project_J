@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "Components/PJCombatComponent.h"
 #include "Components/PJAttributeComponent.h"
+#include "Character/PJCharacter.h"
 
 APJArmour::APJArmour()
 {
@@ -22,6 +23,8 @@ void APJArmour::EquipItem()
 
 	if (UPJCombatComponent* CombatComponent = GetOwner()->GetComponentByClass<UPJCombatComponent>())
 	{
+		SetBodyPartActive(false);
+
 		CombatComponent->SetArmour(this);
 		AttachToOwner(NAME_None);
 	}
@@ -38,6 +41,8 @@ void APJArmour::UnequipItem()
 
 	if (USkeletalMeshComponent* SkeletalMesh = Cast<USkeletalMeshComponent>(Mesh))
 	{
+		SetBodyPartActive(true);
+
 		SkeletalMesh->SetLeaderPoseComponent(nullptr);
 	}
 
@@ -58,6 +63,15 @@ void APJArmour::AttachToOwner(FName SocketName)
 		if (const ACharacter* Character = Cast<ACharacter>(GetOwner()))
 		{
 			SkeletalMesh->SetLeaderPoseComponent(Character->GetMesh());
+			
 		}
+	}
+}
+
+void APJArmour::SetBodyPartActive(const bool bActive) const
+{
+	if (const APJCharacter* Character = Cast< APJCharacter>(GetOwner()))
+	{
+		Character->SetBodyPartActive(ArmourType, bActive);
 	}
 }

@@ -57,11 +57,17 @@ APJCharacter::APJCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-
 	AttributeComponent = CreateDefaultSubobject<UPJAttributeComponent>(TEXT("Attribute"));
 	StateComponent = CreateDefaultSubobject<UPJStateComponent>(TEXT("State"));
 	CombatComponent = CreateDefaultSubobject<UPJCombatComponent>(TEXT("Combat"));
 	TargetingComponent = CreateDefaultSubobject<UPJTargetingComponent>(TEXT("Targeting"));
+
+	TorsoMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TorsoMesh"));
+	LegsMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LegsMesh"));
+	FeetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FeetMesh"));
+	TorsoMesh->SetupAttachment(GetMesh());
+	LegsMesh->SetupAttachment(GetMesh());
+	FeetMesh->SetupAttachment(GetMesh());
 
 	AttributeComponent->OnDeath.AddUObject(this, &ThisClass::OnDeath);
 }
@@ -454,6 +460,31 @@ void APJCharacter::LeftTarget()
 void APJCharacter::RightTarget()
 {
 	TargetingComponent->SwitchingLockedOnActor(ESwitchingDirection::Right);
+}
+
+void APJCharacter::SetBodyPartActive(const EPJArmourType ArmourType, const bool bActive) const
+{
+	switch (ArmourType)
+	{
+	case EPJArmourType::Chest:
+		TorsoMesh->SetVisibility(bActive);
+		TorsoMesh->SetActive(bActive);
+		break;
+	case EPJArmourType::Pants:
+		LegsMesh->SetVisibility(bActive);
+		LegsMesh->SetActive(bActive);
+		break;
+	case EPJArmourType::Gloves:
+	/*	TorsoMesh->SetVisibility(bActive);
+		TorsoMesh->SetActive(bActive);*/
+		break;
+	case EPJArmourType::Boots:
+		FeetMesh->SetVisibility(bActive);
+		FeetMesh->SetActive(bActive);
+		break;
+	default:
+		break;
+	}
 }
 
 FGameplayTag APJCharacter::GetAttackPerform() const

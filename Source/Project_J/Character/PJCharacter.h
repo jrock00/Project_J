@@ -100,6 +100,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<APJFistWeapon> FistWeaponClass;
 
+// 메쉬 파츠
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USkeletalMeshComponent* TorsoMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USkeletalMeshComponent* LegsMesh;	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USkeletalMeshComponent* FeetMesh;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	USoundCue* ImpactSound;
@@ -178,6 +189,9 @@ protected:
 	void LockOnTarget();
 	void LeftTarget();
 	void RightTarget();
+
+public:
+	void SetBodyPartActive(const EPJArmourType ArmourType, const bool bActive) const;
 
 protected:
 	// 현재 상태에서 수행 가능한 일반 공격
