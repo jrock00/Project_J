@@ -105,8 +105,9 @@ if (bHit)
         }
     }
 }
-```
 
+```
+---
 
 4) 델리게이트 활용(애니메이션 종료 처리)
 - 파일: Source/Project_J/AI/Task/BTTaskNode_PerformAttack.cpp
@@ -133,7 +134,7 @@ MontageEndedDelegate.BindLambda([this, &OwnerComp, ControllerPawn](UAnimMontage*
 });
 ```
 
-
+---
 5) Behavior Tree 확장(Decorator / Task / Service)
 - 파일: Source/Project_J/AI/Decorator/BTDecorator_Chance.h/.cpp
   - 난수 기반 조건으로 확률적인 행동 분기 구현:
