@@ -26,11 +26,6 @@ UAnimMontage* UPJMontageActionData::GetRandomMontageForTag(const FGameplayTag& G
 		const int32 RendomIndex = FMath::RandRange(0, MontageGroup.Animations.Num() - 1);
 
 		return  GetMontageForTag(GroupTag, RendomIndex);
-
-		/*if (MontageGroup.Animations.Num() > 0 && MontageGroup.Animations.Num() > Index)
-		{
-			return MontageGroup.Animations[Index];
-		}*/
 	}
 	return nullptr;
 }

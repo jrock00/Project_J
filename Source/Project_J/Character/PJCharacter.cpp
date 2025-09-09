@@ -159,7 +159,7 @@ float APJCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AC
 	if (AttributeComponent)
 	{
 		AttributeComponent->TakeDamageAmount(ActualDamage);
-		GEngine->AddOnScreenDebugMessage(0, 1.5f, FColor::Cyan, FString::Printf(TEXT("Damaged: %f"), ActualDamage));
+		//GEngine->AddOnScreenDebugMessage(0, 1.5f, FColor::Cyan, FString::Printf(TEXT("Damaged: %f"), ActualDamage));
 	}
 
 	StateComponent->SetState(PJGameplayTags::Character_State_Hit);
@@ -524,11 +524,11 @@ void APJCharacter::ExecuteComboAttack(const FGameplayTag& AttackTypeTag)
 		if (bComboSequenceRunning && bCanComboInput == false)
 		{
 			ComboCounter++;
-			UE_LOG(LogTemp, Warning, TEXT("Additional input : Combo Counter = %d"), ComboCounter);
+			UE_LOG(LogTemp, Warning, TEXT("Combo Counter = %d"), ComboCounter);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT(">>> ComboSequence Started <<<"));
+			UE_LOG(LogTemp, Warning, TEXT(">>> ------ComboSequence Started------ <<<"));
 			ResetCombo();
 			bComboSequenceRunning = true;
 		}
@@ -538,7 +538,6 @@ void APJCharacter::ExecuteComboAttack(const FGameplayTag& AttackTypeTag)
 	}
 	else if (bCanComboInput)
 	{
-		UE_LOG(LogTemp, Warning, TEXT(">>>** bCanComboInput = true **<<<"));
 		bSavedComboInput = true;
 	}
 }
@@ -580,14 +579,11 @@ void APJCharacter::DisableComboWindow()
 
 void APJCharacter::AttackFinished(const float ComboResetDelay)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AttackFinished"));
 	if (StateComponent)
 	{
 		StateComponent->ToggleMovementInput(true);
 	}
 	ResetCombo();
-	//GetWorld()->GetTimerManager().SetTimer(ComboResetTimerHandle, this, &ThisClass::ResetCombo, ComboResetDelay, false);
-
 }
 
 void APJCharacter::ActivateWeaponCollision(EWeaponCollisionType WeaponCollisionType)

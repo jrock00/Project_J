@@ -86,7 +86,6 @@ protected:
 protected:
 	void ImpactEffect(const FVector& Location);
 	void HitReaction(const AActor* Attacker);
-	//UAnimMontage* GetHitReactAnimation(const AActor* Attacker) const;
 
 
 public:

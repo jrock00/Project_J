@@ -75,15 +75,12 @@ private:
 	UInputAction* RightTargetAction;
 
 private:
-	// 캐릭터 각종 스텟 관리
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	UPJAttributeComponent* AttributeComponent;
 
-	//상태 관리
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	UPJStateComponent* StateComponent;
 
-	//무기 전투 관리
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	UPJCombatComponent* CombatComponent;
 

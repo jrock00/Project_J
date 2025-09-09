@@ -43,7 +43,6 @@ void APJWeapon::EquipItem()
 
 		AttachToOwner(AttachSocket);
 
-		//무기의 충돌 트레이스
 		WeaponCollision->SetWeaponMesh(Mesh);
 
 		if (ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner()))
@@ -54,7 +53,7 @@ void APJWeapon::EquipItem()
 			}
 		}
 
-		//무기를 소유한 OwnerActor 충돌 무시
+		//무기 소유 OwnerActor 충돌 무시
 		WeaponCollision->AddIgnoredActor(GetOwner());
 	}
 }
@@ -72,11 +71,11 @@ UAnimMontage* APJWeapon::GetRandomMontageForTag(const FGameplayTag& Tag) const
 UAnimMontage* APJWeapon::GetHitReactMontage(const AActor* Attacker) const
 {
 	//lookat 회전값
-//현재 Actor이 공격자를 바라보는 회전값
+	//현재 Actor가 공격자를 바라보는 회전값
 	const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Attacker->GetActorLocation());
 	//현재 Actor의 회전값과 LooAt 회전값의 차이
 	const FRotator DeltaRotation = UKismetMathLibrary::NormalizedDeltaRotator(GetActorRotation(), LookAtRotation);
-	// z축 기준의 회전값 차이만을 취함
+	
 	const float DeltaZ = DeltaRotation.Yaw;
 
 	EHitDirection HitDirection = EHitDirection::Front;
@@ -184,10 +183,8 @@ void APJWeapon::OnHitActor(const FHitResult& Hit)
 {
 	AActor* TargetActor = Hit.GetActor();
 
-	//데미지 방향
 	FVector DamageDirection = GetOwner()->GetActorForwardVector();
 
-	//데미지
 	float AttackDamage = GatAttackDamage();
 
 	UGameplayStatics::ApplyPointDamage(

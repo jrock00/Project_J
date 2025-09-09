@@ -4,6 +4,7 @@
 #include "Equipments/PJArmour.h"
 #include "GameFramework/Character.h"
 #include "Components/PJCombatComponent.h"
+#include "Components/PJAttributeComponent.h"
 
 APJArmour::APJArmour()
 {
@@ -24,6 +25,11 @@ void APJArmour::EquipItem()
 		CombatComponent->SetArmour(this);
 		AttachToOwner(NAME_None);
 	}
+
+	if (UPJAttributeComponent* AttributeComponent = GetOwner()->GetComponentByClass<UPJAttributeComponent>())
+	{
+		AttributeComponent->IncreasDefense(DefenseAmount);
+	}
 }
 
 void APJArmour::UnequipItem()
@@ -33,6 +39,11 @@ void APJArmour::UnequipItem()
 	if (USkeletalMeshComponent* SkeletalMesh = Cast<USkeletalMeshComponent>(Mesh))
 	{
 		SkeletalMesh->SetLeaderPoseComponent(nullptr);
+	}
+
+	if (UPJAttributeComponent* AttributeComponent = GetOwner()->GetComponentByClass<UPJAttributeComponent>())
+	{
+		AttributeComponent->DecreasDefense(DefenseAmount);
 	}
 
 	DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);

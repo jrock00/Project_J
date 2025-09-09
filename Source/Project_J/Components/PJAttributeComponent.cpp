@@ -78,7 +78,13 @@ void UPJAttributeComponent::BroadcastAttributeChanged(EPJAttributeType InAttribu
 
 void UPJAttributeComponent::TakeDamageAmount(float DamageAmount)
 {
-	BaseHealth = FMath::Clamp(BaseHealth - DamageAmount, 0.f, MaxHealth);
+	const float Damage = DamageAmount * (DamageAmount / (DamageAmount + DefenseStat));
+	const float TotalDamage = FMath::Clamp(DamageAmount, 0, Damage);
+
+	GEngine->AddOnScreenDebugMessage(0, 1.5f, FColor::Cyan, FString::Printf(TEXT("Damaged: %f"), TotalDamage));
+
+
+	BaseHealth = FMath::Clamp(BaseHealth - TotalDamage, 0.f, MaxHealth);
 
 	BroadcastAttributeChanged(EPJAttributeType::Health);
 

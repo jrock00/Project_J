@@ -37,6 +37,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float MaxHealth = 100.f;
 
+	UPROPERTY(VisibleAnywhere, Category = "Defense")
+	float DefenseStat = 0.f;
+
+
 	FTimerHandle StaminaRegenTimerHandle;
 
 
@@ -54,6 +58,9 @@ public:
 	FORCEINLINE float GetMaxStamina() const { return MaxStamina; }
 	FORCEINLINE float GetBaseHealth() const { return BaseHealth; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+
+	FORCEINLINE void IncreasDefense(const float DefenseAmount) { DefenseStat += DefenseAmount; }
+	FORCEINLINE void DecreasDefense(const float DefenseAmount) { DefenseStat -= DefenseAmount; }
 
 	FORCEINLINE float GetStaminaRatio() const { return BaseStamina / MaxStamina; }
 	FORCEINLINE float GetHealthRatio() const { return BaseHealth / MaxHealth; }
