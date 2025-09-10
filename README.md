@@ -2,8 +2,6 @@
 
 Project_J는 Unreal Engine(C++) 기반으로 작성된 게임 프로젝트입니다. Gameplay Tag 정의, AI(Behavior Tree) 노드, 전투 관련 컴포넌트/인터페이스, 애니메이션 몽타주 데이터 등 게임 플레이 핵심 로직을 C++로 구현한 코드가 들어 있습니다
 
-이 README는 포트폴리오/면접용으로, 구현한 핵심 기술과 엔진/C++ 전문성을 설명
-
 ---
 
 - ## 핵심 구현 요약
@@ -105,8 +103,9 @@ if (bHit)
         }
     }
 }
-```
 
+```
+---
 
 4) 델리게이트 활용(애니메이션 종료 처리)
 - 파일: Source/Project_J/AI/Task/BTTaskNode_PerformAttack.cpp
@@ -133,7 +132,7 @@ MontageEndedDelegate.BindLambda([this, &OwnerComp, ControllerPawn](UAnimMontage*
 });
 ```
 
-
+---
 5) Behavior Tree 확장(Decorator / Task / Service)
 - 파일: Source/Project_J/AI/Decorator/BTDecorator_Chance.h/.cpp
   - 난수 기반 조건으로 확률적인 행동 분기 구현:
