@@ -10,6 +10,8 @@
 
 class APJWeapon;
 class APJArmour;
+class APJShield;
+class APJEquipment;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FDelegateOnChangedCombat, bool);
 
@@ -24,6 +26,9 @@ public:
 protected:
 	UPROPERTY();
 	APJWeapon* MainWeapon;
+
+	UPROPERTY();
+	APJShield* Shield;
 
 	UPROPERTY();
 	TMap<EPJArmourType, APJArmour*> ArmourMap;
@@ -45,6 +50,7 @@ public:
 
 public:
 	void SetWeapon(APJWeapon* NewWeapon);
+	void SetShield(APJShield* NewShield);
 	void SetArmour(APJArmour* NewArmour);
 
 public:
@@ -53,6 +59,7 @@ public:
 	void SetCombatEnabled(const bool bEnabled);
 
 	FORCEINLINE APJWeapon* GetMainWeapon() const { return MainWeapon; }
+	FORCEINLINE APJShield* GetShield() const { return Shield; }
 	FORCEINLINE APJArmour* GetArmour(const EPJArmourType ArmourType) const 
 	{ 
 		if (ArmourMap.Contains(ArmourType))
@@ -65,4 +72,6 @@ public:
 	FORCEINLINE FGameplayTag GetLastAttackType() const { return LastAttackType; };
 	FORCEINLINE void SetLastAttackType(const FGameplayTag& NewAttackTag) { LastAttackType = NewAttackTag; };
 
+private:
+	void SpawnPickupItem(const AActor* OwnerActor, const TSubclassOf<APJEquipment>& NewEquipmentClass) const;
 };

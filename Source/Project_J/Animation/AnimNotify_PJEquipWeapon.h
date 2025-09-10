@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PJDefine.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "AnimNotify_PJEquipWeapon.generated.h"
@@ -18,6 +19,9 @@ class PROJECT_J_API UAnimNotify_PJEquipWeapon : public UAnimNotify
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag MontageActionTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EPJEquipmentType EquipmentType = EPJEquipmentType::Weapon;
 
 public:
 	UAnimNotify_PJEquipWeapon(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());

@@ -62,3 +62,10 @@ enum class EPJArmourType : uint8
 	Boots,
 	Gloves,
 };
+
+UENUM(BlueprintType)
+enum class EPJEquipmentType : uint8
+{
+	Weapon,
+	Shield,
+};

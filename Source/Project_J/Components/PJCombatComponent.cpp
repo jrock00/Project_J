@@ -2,9 +2,10 @@
 
 
 #include "Components/PJCombatComponent.h"
-//#include "Equipments/PJEquipment.h"
+#include "Equipments/PJEquipment.h"
 #include "Equipments/PJWeapon.h"
 #include "Equipments/PJArmour.h"
+#include "Equipments/PJShield.h"
 #include "Items/PJPickupItem.h"
 #include "Character/PJCharacter.h"
 #include "GameFramework/Actor.h"
@@ -44,7 +45,7 @@ void UPJCombatComponent::SetWeapon(APJWeapon* NewWeapon)
 	{
 		if (APJCharacter* OwnerCharacter = Cast<APJCharacter>(GetOwner()))
 		{
-			APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
+			/*APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
 				APJPickupItem::StaticClass(),
 				OwnerCharacter->GetActorTransform(),
 				nullptr,
@@ -52,7 +53,8 @@ void UPJCombatComponent::SetWeapon(APJWeapon* NewWeapon)
 				ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 
 			PickupItem->SetEquipmentClass(MainWeapon->GetClass());
-			PickupItem->FinishSpawning(GetOwner()->GetActorTransform());
+			PickupItem->FinishSpawning(GetOwner()->GetActorTransform());*/
+			SpawnPickupItem(OwnerCharacter, MainWeapon->GetClass());
 
 			MainWeapon->Destroy();
 		}
@@ -62,6 +64,21 @@ void UPJCombatComponent::SetWeapon(APJWeapon* NewWeapon)
 
 	MainWeapon = NewWeapon;
 }
+void UPJCombatComponent::SetShield(APJShield* NewShield)
+{
+	if (::IsValid(Shield))
+	{
+		if (const AActor* OwnerActor = GetOwner())
+		{
+			SpawnPickupItem(OwnerActor, Shield->GetClass());
+
+			Shield->Destroy();
+		}
+	}
+
+	Shield = NewShield;
+}
+
 void UPJCombatComponent::SetArmour(APJArmour* NewArmour)
 {
 	const EPJArmourType ArmourType = NewArmour->GetArmourType();
@@ -72,7 +89,8 @@ void UPJCombatComponent::SetArmour(APJArmour* NewArmour)
 		{
 			if (const AActor* OwnerActor = GetOwner())
 			{
-				APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
+				SpawnPickupItem(OwnerActor, EquippedArmourPart->GetClass());
+				/*APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
 					APJPickupItem::StaticClass(),
 					OwnerActor->GetActorTransform(),
 					nullptr,
@@ -80,7 +98,7 @@ void UPJCombatComponent::SetArmour(APJArmour* NewArmour)
 					ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 
 				PickupItem->SetEquipmentClass(EquippedArmourPart->GetClass());
-				PickupItem->FinishSpawning(GetOwner()->GetActorTransform());
+				PickupItem->FinishSpawning(GetOwner()->GetActorTransform());*/
 			}
 			EquippedArmourPart->UnequipItem();
 			EquippedArmourPart->Destroy();
@@ -100,4 +118,17 @@ void UPJCombatComponent::SetCombatEnabled(const bool bEnabled)
 	{
 		OnChangedCombat.Broadcast(bCombatEnabled); 
 	}
+}
+
+void UPJCombatComponent::SpawnPickupItem(const AActor* OwnerActor, const TSubclassOf<APJEquipment>& NewEquipmentClass) const
+{
+	APJPickupItem* PickupItem = GetWorld()->SpawnActorDeferred<APJPickupItem>(
+		APJPickupItem::StaticClass(),
+		OwnerActor->GetActorTransform(),
+		nullptr,
+		nullptr,
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+
+	PickupItem->SetEquipmentClass(NewEquipmentClass);
+	PickupItem->FinishSpawning(OwnerActor->GetActorTransform());
 }

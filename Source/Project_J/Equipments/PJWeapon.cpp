@@ -2,6 +2,7 @@
 
 
 #include "Equipments/PJWeapon.h"
+#include "Equipments/PJShield.h"
 #include "Animation/PJAnimInstance.h"
 #include "Character/PJCharacter.h"
 #include "../PJGameplayTags.h"
@@ -55,6 +56,20 @@ void APJWeapon::EquipItem()
 
 		//公扁 家蜡 OwnerActor 面倒 公矫
 		WeaponCollision->AddIgnoredActor(GetOwner());
+
+		if (APJShield* Shield = CombatComponent->GetShield())
+		{
+			FName ShieldAttachSocket = Shield->GetUnequipSocketName();
+
+			if (CombatType == ECombatType::SwordShield)
+			{
+				if (CombatComponent->IsCombatEnable())
+				{
+					ShieldAttachSocket = Shield->GetEquipSocketName();
+				}
+			}
+			Shield->AttachToOwner(ShieldAttachSocket);
+		}
 	}
 }
 

@@ -63,7 +63,6 @@ void APJArmour::AttachToOwner(FName SocketName)
 		if (const ACharacter* Character = Cast<ACharacter>(GetOwner()))
 		{
 			SkeletalMesh->SetLeaderPoseComponent(Character->GetMesh());
-			
 		}
 	}
 }
