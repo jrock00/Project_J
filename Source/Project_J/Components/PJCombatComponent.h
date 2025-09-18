@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	bool bCombatEnabled = false;
 
+	UPROPERTY()
+	bool bBlockingEnable = false;
+
 	UPROPERTY(VisibleAnywhere)
 	FGameplayTag LastAttackType;
 
@@ -57,6 +60,9 @@ public:
 	FORCEINLINE bool IsCombatEnable() const { return bCombatEnabled; }
 	//FORCEINLINE void SetCombatEnabled(const bool bEnabled) { bCombatEnabled = bEnabled; }
 	void SetCombatEnabled(const bool bEnabled);
+
+	FORCEINLINE bool IsBlockingEnable() const { return bBlockingEnable; }
+	FORCEINLINE void SetBlockingEnable(const bool bEnable)  { bBlockingEnable = bEnable; }
 
 	FORCEINLINE APJWeapon* GetMainWeapon() const { return MainWeapon; }
 	FORCEINLINE APJShield* GetShield() const { return Shield; }

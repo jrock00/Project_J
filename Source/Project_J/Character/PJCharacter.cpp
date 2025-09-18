@@ -19,6 +19,8 @@
 #include "Components/PJCombatComponent.h"
 #include "Components/PJTargetingComponent.h"
 
+#include "Animation/PJAnimInstance.h"
+
 #include "UI/PJPlayerHUDWidget.h"
 
 #include "Kismet/KismetSystemLibrary.h"
@@ -144,6 +146,9 @@ void APJCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(LockOnTargetAction, ETriggerEvent::Started, this, &ThisClass::LockOnTarget);
 		EnhancedInputComponent->BindAction(LeftTargetAction, ETriggerEvent::Started, this, &ThisClass::LeftTarget);
 		EnhancedInputComponent->BindAction(RightTargetAction, ETriggerEvent::Started, this, &ThisClass::RightTarget);
+	
+		EnhancedInputComponent->BindAction(BlockAction, ETriggerEvent::Started, this, &ThisClass::Blocking);
+		EnhancedInputComponent->BindAction(BlockAction, ETriggerEvent::Completed, this, &ThisClass::BlockingEnd);
 	}
 
 }
@@ -298,6 +303,14 @@ void APJCharacter::Look(const FInputActionValue& Value)
 
 void APJCharacter::Sprinting()
 {
+	check(AttributeComponent);
+	check(CombatComponent);
+
+	if (CombatComponent->IsBlockingEnable())
+	{
+		return;
+	}
+
 	if (AttributeComponent->CheckHasEnoughStamina(5.f) && IsMoving())
 	{
 		AttributeComponent->ToggleStaminaRegeneration(false);
@@ -316,6 +329,11 @@ void APJCharacter::Sprinting()
 
 void APJCharacter::StopSprint()
 {
+	if (CombatComponent->IsBlockingEnable())
+	{
+		return;
+	}
+
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 	AttributeComponent->ToggleStaminaRegeneration(true);
 	bSprinting = false;
@@ -460,6 +478,41 @@ void APJCharacter::LeftTarget()
 void APJCharacter::RightTarget()
 {
 	TargetingComponent->SwitchingLockedOnActor(ESwitchingDirection::Right);
+}
+
+void APJCharacter::Blocking()
+{
+	check(CombatComponent);
+	check(StateComponent);
+
+	if (CombatComponent->GetMainWeapon())
+	{
+		if (CanPlayerBlockStance())
+		{
+			GetCharacterMovement()->MaxWalkSpeed = BlockingSpeed;
+			CombatComponent->SetBlockingEnable(true);
+			if (UPJAnimInstance* AnimInstance = Cast<UPJAnimInstance>(GetMesh()->GetAnimInstance()))
+			{
+				AnimInstance->UpdataBlocking(true);
+				StateComponent->SetState(PJGameplayTags::Character_State_Blocking);
+			}
+		}
+	}
+
+}
+
+void APJCharacter::BlockingEnd()
+{
+	check(CombatComponent);
+	check(StateComponent);
+
+	CombatComponent->SetBlockingEnable(false);
+	if (UPJAnimInstance* AnimInstance = Cast<UPJAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		AnimInstance->UpdataBlocking(false);
+		StateComponent->ClearState();
+	}
+	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
 
 void APJCharacter::SetBodyPartActive(const EPJArmourType ArmourType, const bool bActive) const
@@ -615,6 +668,34 @@ void APJCharacter::AttackFinished(const float ComboResetDelay)
 		StateComponent->ToggleMovementInput(true);
 	}
 	ResetCombo();
+}
+
+bool APJCharacter::CanPlayerBlockStance() const
+{
+	check(StateComponent);
+	check(AttributeComponent);
+	check(CombatComponent);
+
+	if (IsSprinting())
+	{
+		return false;
+	}
+
+	APJWeapon* Weapon = CombatComponent->GetMainWeapon();
+	if (!IsValid(Weapon))
+	{
+		return false;
+	}
+
+	FGameplayTagContainer CheckTages;
+	CheckTages.AddTag(PJGameplayTags::Character_State_Attacking);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Hit);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Rolling);
+	CheckTages.AddTag(PJGameplayTags::Character_State_GeneralAction);
+
+	return StateComponent->IsCurrentStateEqualToAny(CheckTages) == false
+		&& Weapon->GetCombatType() == ECombatType::SwordShield
+		&& AttributeComponent->CheckHasEnoughStamina(1.f);
 }
 
 void APJCharacter::ActivateWeaponCollision(EWeaponCollisionType WeaponCollisionType)

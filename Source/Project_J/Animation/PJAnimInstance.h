@@ -46,6 +46,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Data")
 	ECombatType CombatType = ECombatType::None;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat Data")
+	bool bShouldBlocking = false;
+
 public:
 	UPJAnimInstance();
 
@@ -62,6 +65,9 @@ public:
 
 public:
 	void UpdateCombatMode(const ECombatType InCombatType);
+
+public:
+	void UpdataBlocking(bool IsShouldBlocing);
 
 protected:
 	void OnChangedCombat(const bool bInCombatEnabled);

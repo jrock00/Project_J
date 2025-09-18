@@ -74,6 +74,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* RightTargetAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* BlockAction;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	UPJAttributeComponent* AttributeComponent;
@@ -119,13 +122,16 @@ protected:
 	UParticleSystem* ImpactParticle;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Sprinting")
+	UPROPERTY(EditAnywhere, Category = "Movement Speed")
 	float SprintingSpeed = 750.f;
 	
-	UPROPERTY(EditAnywhere, Category = "Sprinting")
+	UPROPERTY(EditAnywhere, Category = "Movement Speed")
 	float NormalSpeed = 500.f;
 
-	UPROPERTY(EditAnywhere, Category = "Sprinting")
+	UPROPERTY(EditAnywhere, Category = "Movement Speed")
+	float BlockingSpeed = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement Speed")
 	bool bSprinting = false;
 
 protected:
@@ -190,6 +196,10 @@ protected:
 	void LeftTarget();
 	void RightTarget();
 
+	void Blocking();
+	void BlockingEnd();
+
+
 public:
 	void SetBodyPartActive(const EPJArmourType ArmourType, const bool bActive) const;
 
@@ -206,6 +216,9 @@ public:
 	void EnableComboWindow();
 	void DisableComboWindow();
 	void AttackFinished(const float ComboResetDelay);
+
+public:
+	bool CanPlayerBlockStance() const;
 
 public:
 	// IPJCombatInterface을(를) 통해 상속됨

@@ -78,6 +78,11 @@ void UPJAnimInstance::UpdateCombatMode(const ECombatType InCombatType)
 	CombatType = InCombatType;
 }
 
+void UPJAnimInstance::UpdataBlocking(bool IsShouldBlocing)
+{
+	bShouldBlocking = IsShouldBlocing;
+}
+
 void UPJAnimInstance::OnChangedCombat(const bool bInCombatEnabled)
 {
 	bCombatEnabled = bInCombatEnabled;
