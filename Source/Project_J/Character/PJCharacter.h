@@ -143,6 +143,10 @@ protected:
 	FTimerHandle ComboResetTimerHandle;
 
 protected:
+	// 공격 방향과 방어 방향 체크
+	bool bFacingEnemy = false;
+
+protected:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	UAnimMontage* RollingMontage;
 
@@ -219,6 +223,7 @@ public:
 
 public:
 	bool CanPlayerBlockStance() const;
+	bool CanParformAttackBlocking() const;
 
 public:
 	// IPJCombatInterface을(를) 통해 상속됨

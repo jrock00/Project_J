@@ -24,6 +24,7 @@
 #include "UI/PJPlayerHUDWidget.h"
 
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Interfaces/PJInteract.h"
@@ -167,13 +168,28 @@ float APJCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AC
 {
 	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	if (AttributeComponent)
+	check(AttributeComponent);
+	check(StateComponent);
+
+	bFacingEnemy = UKismetMathLibrary::InRange_FloatFloat(GetDotProductTo(EventInstigator->GetPawn()), -0.1f, 1.f);
+
+	if (CanParformAttackBlocking())
+	{
+		AttributeComponent->TakeDamageAmount(0.0f);
+		AttributeComponent->DecreaseStamina(20.f);
+		StateComponent->SetState(PJGameplayTags::Character_State_Blocking);
+	}
+	else
 	{
 		AttributeComponent->TakeDamageAmount(ActualDamage);
-		//GEngine->AddOnScreenDebugMessage(0, 1.5f, FColor::Cyan, FString::Printf(TEXT("Damaged: %f"), ActualDamage));
+		StateComponent->SetState(PJGameplayTags::Character_State_Hit);
 	}
 
-	StateComponent->SetState(PJGameplayTags::Character_State_Hit);
+	//if (AttributeComponent)
+	//{
+	//	//GEngine->AddOnScreenDebugMessage(0, 1.5f, FColor::Cyan, FString::Printf(TEXT("Damaged: %f"), ActualDamage));
+	//}
+
 	StateComponent->ToggleMovementInput(false);
 
 	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
@@ -208,7 +224,14 @@ void APJCharacter::HitReaction(const AActor* Attacker)
 {
 	check(CombatComponent);
 
-	if (UAnimMontage* HitReactAnimMontege = CombatComponent->GetMainWeapon()->GetHitReactMontage(Attacker))
+	if (CanParformAttackBlocking())
+	{
+		if (UAnimMontage* BlockingMontage = CombatComponent->GetMainWeapon()->GetMontageForTag(PJGameplayTags::Character_Action_BlockingHit))
+		{
+			PlayAnimMontage(BlockingMontage);
+		}
+	}
+	else if (UAnimMontage* HitReactAnimMontege = CombatComponent->GetMainWeapon()->GetHitReactMontage(Attacker))
 	{
 		PlayAnimMontage(HitReactAnimMontege);
 	}
@@ -564,6 +587,7 @@ bool APJCharacter::CanPerFormAttack(const FGameplayTag& AttackTypeTag) const
 	CheckTags.AddTag(PJGameplayTags::Character_State_Rolling);
 	CheckTags.AddTag(PJGameplayTags::Character_State_GeneralAction);
 	CheckTags.AddTag(PJGameplayTags::Character_State_Hit);
+	CheckTags.AddTag(PJGameplayTags::Character_State_Blocking);
 
 	const float StaminaCost = CombatComponent->GetMainWeapon()->GetStaminaCost(AttackTypeTag);
 
@@ -696,6 +720,15 @@ bool APJCharacter::CanPlayerBlockStance() const
 	return StateComponent->IsCurrentStateEqualToAny(CheckTages) == false
 		&& Weapon->GetCombatType() == ECombatType::SwordShield
 		&& AttributeComponent->CheckHasEnoughStamina(1.f);
+}
+
+bool APJCharacter::CanParformAttackBlocking() const
+{
+	check(StateComponent);
+	check(AttributeComponent);
+	check(CombatComponent);
+
+	return bFacingEnemy && CombatComponent->IsBlockingEnable() && AttributeComponent->CheckHasEnoughStamina(20.f);
 }
 
 void APJCharacter::ActivateWeaponCollision(EWeaponCollisionType WeaponCollisionType)

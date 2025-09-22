@@ -15,7 +15,8 @@ namespace PJGameplayTags
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Action_Equip);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Action_Unequip);
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Action_HitReaction);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Action_HitReaction); 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Action_BlockingHit);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Attack_Light);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Character_Attack_Running);
