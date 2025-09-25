@@ -150,6 +150,9 @@ void APJCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 		EnhancedInputComponent->BindAction(BlockAction, ETriggerEvent::Started, this, &ThisClass::Blocking);
 		EnhancedInputComponent->BindAction(BlockAction, ETriggerEvent::Completed, this, &ThisClass::BlockingEnd);
+
+		EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ThisClass::Parrying);
+
 	}
 
 }
@@ -172,6 +175,22 @@ float APJCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AC
 	check(StateComponent);
 
 	bFacingEnemy = UKismetMathLibrary::InRange_FloatFloat(GetDotProductTo(EventInstigator->GetPawn()), -0.1f, 1.f);
+
+	if (ParriedAttackSucceed())
+	{
+		if (IPJCombatInterface* CombatInterface = Cast<IPJCombatInterface>(EventInstigator->GetPawn()))
+		{
+			CombatInterface->Parried();
+
+			APJWeapon* MainWeapon = CombatComponent->GetMainWeapon();
+			if (IsValid(MainWeapon))
+			{
+				FVector Loaction = MainWeapon->GetActorLocation();
+				BlockingEffect(Loaction);
+			}
+		}
+		return ActualDamage;
+	}
 
 	if (CanParformAttackBlocking())
 	{
@@ -556,6 +575,29 @@ void APJCharacter::BlockingEnd()
 	GetCharacterMovement()->MaxWalkSpeed = NormalSpeed;
 }
 
+void APJCharacter::Parrying()
+{
+	check(CombatComponent);
+	check(StateComponent);
+	check(AttributeComponent);
+
+	if (CanParformParring())
+	{
+		if (const APJWeapon* MainWeapon = CombatComponent->GetMainWeapon())
+		{
+			UAnimMontage* ParryingMontage = MainWeapon->GetMontageForTag(PJGameplayTags::Character_State_Parrying);
+
+			StateComponent->ToggleMovementInput(false);
+			AttributeComponent->ToggleStaminaRegeneration(false);
+			AttributeComponent->DecreaseStamina(10.f);
+
+			PlayAnimMontage(ParryingMontage);
+
+			AttributeComponent->ToggleStaminaRegeneration(true, 1.5f);
+		}
+	}
+}
+
 void APJCharacter::SetBodyPartActive(const EPJArmourType ArmourType, const bool bActive) const
 {
 	switch (ArmourType)
@@ -734,6 +776,7 @@ bool APJCharacter::CanPlayerBlockStance() const
 	CheckTages.AddTag(PJGameplayTags::Character_State_Hit);
 	CheckTages.AddTag(PJGameplayTags::Character_State_Rolling);
 	CheckTages.AddTag(PJGameplayTags::Character_State_GeneralAction);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Death);
 
 	return StateComponent->IsCurrentStateEqualToAny(CheckTages) == false
 		&& Weapon->GetCombatType() == ECombatType::SwordShield
@@ -747,6 +790,42 @@ bool APJCharacter::CanParformAttackBlocking() const
 	check(CombatComponent);
 
 	return bFacingEnemy && CombatComponent->IsBlockingEnable() && AttributeComponent->CheckHasEnoughStamina(20.f);
+}
+
+bool APJCharacter::CanParformParring() const
+{
+	check(StateComponent);
+	check(AttributeComponent);
+	check(CombatComponent);
+
+	APJWeapon* Weapon = CombatComponent->GetMainWeapon();
+	if (!IsValid(Weapon))
+	{
+		return false;
+	}
+
+	FGameplayTagContainer CheckTages;
+	CheckTages.AddTag(PJGameplayTags::Character_State_Attacking);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Hit);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Rolling);
+	CheckTages.AddTag(PJGameplayTags::Character_State_GeneralAction);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Blocking);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Death);
+	CheckTages.AddTag(PJGameplayTags::Character_State_Parrying);
+
+	return StateComponent->IsCurrentStateEqualToAny(CheckTages) == false
+		&& Weapon->GetCombatType() == ECombatType::SwordShield
+		&& AttributeComponent->CheckHasEnoughStamina(1.f);
+}
+
+bool APJCharacter::ParriedAttackSucceed() const
+{
+	check(StateComponent);
+
+	FGameplayTagContainer CheckTages;
+	CheckTages.AddTag(PJGameplayTags::Character_State_Parrying);
+
+	return StateComponent->IsCurrentStateEqualToAny(CheckTages) && bFacingEnemy;
 }
 
 void APJCharacter::ActivateWeaponCollision(EWeaponCollisionType WeaponCollisionType)

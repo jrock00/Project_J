@@ -77,6 +77,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* BlockAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* ParryAction;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
 	UPJAttributeComponent* AttributeComponent;
@@ -211,6 +214,7 @@ protected:
 	void Blocking();
 	void BlockingEnd();
 
+	void Parrying();
 
 public:
 	void SetBodyPartActive(const EPJArmourType ArmourType, const bool bActive) const;
@@ -232,6 +236,10 @@ public:
 public:
 	bool CanPlayerBlockStance() const;
 	bool CanParformAttackBlocking() const;
+	bool CanParformParring() const;
+
+public:
+	bool ParriedAttackSucceed() const;
 
 public:
 	// IPJCombatInterface을(를) 통해 상속됨

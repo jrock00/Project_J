@@ -29,4 +29,6 @@ public:
 	virtual void DeactivateWeaponCollision(EWeaponCollisionType WeaponCollisionType) = 0;
 
 	virtual void PerformAttack(FGameplayTag& AttackTypeTag, FOnMontageEnded& MontageEndedDelegate) {}
+
+	virtual void Parried() {}
 };

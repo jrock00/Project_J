@@ -120,6 +120,12 @@ float APJEnemy::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AContr
 	return ActualDamage;
 }
 
+void APJEnemy::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorld()->GetTimerManager().ClearTimer(ParriedDelayTimerHandle);
+	Super::EndPlay(EndPlayReason);
+}
+
 void APJEnemy::OnDeath()
 {
 	if (AAIController* AIController = Cast<AAIController>(GetController()))
@@ -255,6 +261,35 @@ void APJEnemy::PerformAttack(FGameplayTag& AttackTypeTag, FOnMontageEnded& Monta
 		AttributeComponent->ToggleStaminaRegeneration(true, 1.5f);
 	}
 
+}
+
+void APJEnemy::Parried()
+{
+	check(StateComponent);
+	check(AttributeComponent);
+	check(CombatComponent);
+
+	StopAnimMontage();
+
+	StateComponent->SetState(PJGameplayTags::Character_State_Parried);
+
+	if (const APJWeapon* Weapon = CombatComponent->GetMainWeapon())
+	{
+		UAnimMontage* ParriedAnimMontage = Weapon->GetMontageForTag(PJGameplayTags::Character_Action_ParriedHit);
+		const float Delay = PlayAnimMontage(ParriedAnimMontage) + 1.f;
+
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindLambda([this]() 
+			{
+				FGameplayTagContainer CheckTages;
+				CheckTages.AddTag(PJGameplayTags::Character_State_Death);
+				if (StateComponent->IsCurrentStateEqualToAny(CheckTages) == false)
+				{
+					StateComponent->ClearState();
+				}
+			});
+		GetWorld()->GetTimerManager().SetTimer(ParriedDelayTimerHandle, TimerDelegate, Delay, false);
+	}
 }
 
 void APJEnemy::ToggleHealthBarVisibility(bool bVisibility)

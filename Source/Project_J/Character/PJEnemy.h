@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<APJWeapon> DefaultWeaponClass;
 
+protected:
+	FTimerHandle ParriedDelayTimerHandle;
+
 public:
 	APJEnemy();
 
@@ -77,6 +80,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 protected:
 	virtual void OnDeath();
@@ -98,6 +102,7 @@ public:
 	void ActivateWeaponCollision(EWeaponCollisionType WeaponCollisionType) override;
 	void DeactivateWeaponCollision(EWeaponCollisionType WeaponCollisionType) override;
 	void PerformAttack(FGameplayTag& AttackTypeTag, FOnMontageEnded& MontageEndedDelegate) override;
+	void Parried() override;
 
 	void ToggleHealthBarVisibility(bool bVisibility);
 
