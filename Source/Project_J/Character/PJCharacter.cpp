@@ -211,13 +211,31 @@ float APJCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AC
 
 void APJCharacter::ImpactEffect(const FVector& Location)
 {
-	if (ImpactParticle)
+	if (CanParformAttackBlocking())
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, Location);
+		BlockingEffect(Location);
 	}
-	if (ImpactSound)
+	else
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, Location);
+		if (ImpactParticle)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticle, Location);
+		}
+		if (ImpactSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, Location);
+		}
+	}
+}
+void APJCharacter::BlockingEffect(const FVector& Location)
+{
+	if (BlockingParticle)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BlockingParticle, Location);
+	}
+	if (BlockingSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, BlockingSound, Location);
 	}
 }
 void APJCharacter::HitReaction(const AActor* Attacker)

@@ -122,6 +122,13 @@ protected:
 	UParticleSystem* ImpactParticle;
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	USoundCue* BlockingSound;
+
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UParticleSystem* BlockingParticle;
+
+protected:
 	UPROPERTY(EditAnywhere, Category = "Movement Speed")
 	float SprintingSpeed = 750.f;
 	
@@ -171,6 +178,7 @@ public:
 public:
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	void ImpactEffect(const FVector& Location);
+	void BlockingEffect(const FVector& Location);
 	void HitReaction(const AActor* Attacker);
 	void OnDeath();
 
